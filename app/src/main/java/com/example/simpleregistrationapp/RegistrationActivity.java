@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.*;
 
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.textfield.*;
 
 import java.util.Objects;
@@ -14,9 +13,9 @@ import java.util.Objects;
 public class RegistrationActivity extends AppCompatActivity {
 
     // creating global view objects
-    private TextInputLayout mFullNameLayout, mEmailLayout, mPasswordLayout;
-    private TextInputEditText edtFUllName, edtEmail, edtPassword;
-    private Button mSubmitButton;
+    private TextInputLayout fullNameInputLayout, emailInputLayout, passwordInputLayout;
+    private TextInputEditText fullNameEditText, emailEditText, passwordEditText;
+    private Button submitButton;
 
     // creating global String variables
     // to hold the inputted values
@@ -29,9 +28,9 @@ public class RegistrationActivity extends AppCompatActivity {
 
         initializeViews();
 
-        edtFUllName.requestFocus();
+        fullNameEditText.requestFocus();
 
-        mSubmitButton.setOnClickListener(new View.OnClickListener() {
+        submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 validatingEmptyInputs();
@@ -42,35 +41,31 @@ public class RegistrationActivity extends AppCompatActivity {
 
     private void validatingEmptyInputs() {
         // holding inputted data into String variables
-        full_name = Objects.requireNonNull(edtFUllName.getText()).toString();
-        email = Objects.requireNonNull(edtEmail.getText()).toString();
-        password = Objects.requireNonNull(edtPassword.getText()).toString();
+        full_name = Objects.requireNonNull(fullNameEditText.getText()).toString();
+        email = Objects.requireNonNull(emailEditText.getText()).toString();
+        password = Objects.requireNonNull(passwordEditText.getText()).toString();
 
         // checking if the inputted data
         // is empty to show error message
-        if (full_name.isEmpty()){
-            mFullNameLayout.setError("Enter your name");
-            edtFUllName.requestFocus();
-        } else if (email.isEmpty()){
-            mEmailLayout.setError("Enter your email");
-            edtEmail.requestFocus();
-        } else {
-            mPasswordLayout.setError("Enter strong password");
-            edtPassword.requestFocus();
+        displayErrorMessage(full_name, fullNameInputLayout, "Enter your full name", fullNameEditText);
+        displayErrorMessage(email, emailInputLayout, "Enter your email", emailEditText);
+        displayErrorMessage(password, passwordInputLayout, "Enter your password", passwordEditText);
+    }
+
+    private void displayErrorMessage(String input, TextInputLayout inputLayout, String errorMessage, TextInputEditText inputEditText){
+        if (input.isEmpty()){
+            inputLayout.setError(errorMessage);
+            inputEditText.requestFocus();
         }
     }
 
-    private void showErrorMessage(View view) {
-        Snackbar.make(view, "Please fill the blanks", Snackbar.LENGTH_LONG).show();
-    }
-
     private void initializeViews() {
-        mFullNameLayout = findViewById(R.id.tfFullName);
-        mEmailLayout = findViewById(R.id.tfEmail);
-        mPasswordLayout = findViewById(R.id.tfPassword);
-        edtFUllName = findViewById(R.id.edt_full_name);
-        edtEmail = findViewById(R.id.edt_email);
-        edtPassword = findViewById(R.id.edt_pasword);
-        mSubmitButton = findViewById(R.id.submit_btn);
+        fullNameInputLayout = findViewById(R.id.textInput_full_name);
+        emailInputLayout = findViewById(R.id.textInput_email);
+        passwordInputLayout = findViewById(R.id.textInput_password);
+        fullNameEditText = findViewById(R.id.editText_full_name);
+        emailEditText = findViewById(R.id.editText_email);
+        passwordEditText = findViewById(R.id.editText_password);
+        submitButton = findViewById(R.id.submit_btn);
     }
 }
