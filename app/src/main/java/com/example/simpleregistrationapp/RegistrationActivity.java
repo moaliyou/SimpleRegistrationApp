@@ -1,22 +1,38 @@
 package com.example.simpleregistrationapp;
 
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Patterns;
+import android.view.View;
+import android.widget.Button;
+
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
-import android.view.View;
-import android.widget.*;
-
-import com.google.android.material.textfield.*;
+import com.google.android.material.textfield.TextInputEditText;
+import com.google.android.material.textfield.TextInputLayout;
 
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 public class RegistrationActivity extends AppCompatActivity {
+
+    static final String EMAIL = "email";
+    static final String FULL_NAME = "full_name";
+    static final String PASSWORD = "password";
+    private final String EMPTY_ERROR_MESSAGE = "Field must be filled";
+    private final Pattern PASSWORD_PATTERN = Pattern.compile("^" +
+            "(?=.*[0-9])" +         //at least 1 digit
+            "(?=.*[a-z])" +         //at least 1 lower case letter
+            "(?=.*[A-Z])" +         //at least 1 upper case letter
+            "(?=.*[@#$%^&+=])" +    //at least 1 special character
+            "(?=\\S+$)" +           //no white spaces
+            ".{8,}" +               //at least 8 characters
+            "$");
 
     // creating global view objects
     private TextInputLayout fullNameInputLayout, emailInputLayout, passwordInputLayout;
     private TextInputEditText fullNameEditText, emailEditText, passwordEditText;
     private Button submitButton;
-
     // creating global String variables
     // to hold the inputted values
     private String full_name, email, password;
@@ -28,34 +44,60 @@ public class RegistrationActivity extends AppCompatActivity {
 
         initializeViews();
 
-        fullNameEditText.requestFocus();
-
         submitButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                validatingEmptyInputs();
+                if (!isFullNameValid() | !isEmailValidate() | !isPasswordValid())
+                    return;
+
+                Intent intent = new Intent(v.getContext(), MainActivity.class);
+                intent.putExtra(FULL_NAME, full_name);
+                intent.putExtra(EMAIL, email);
+                startActivity(intent);
             }
         });
 
     }
 
-    private void validatingEmptyInputs() {
-        // holding inputted data into String variables
-        full_name = Objects.requireNonNull(fullNameEditText.getText()).toString();
-        email = Objects.requireNonNull(emailEditText.getText()).toString();
+    private boolean isPasswordValid() {
         password = Objects.requireNonNull(passwordEditText.getText()).toString();
-
-        // checking if the inputted data
-        // is empty to show error message
-        displayErrorMessage(full_name, fullNameInputLayout, "Enter your full name", fullNameEditText);
-        displayErrorMessage(email, emailInputLayout, "Enter your email", emailEditText);
-        displayErrorMessage(password, passwordInputLayout, "Enter your password", passwordEditText);
+        if (password.isEmpty()) {
+            passwordInputLayout.setError(EMPTY_ERROR_MESSAGE);
+            return false;
+        } else if (!PASSWORD_PATTERN.matcher(password).matches()) {
+            passwordInputLayout.setError("Password too weak");
+            return false;
+        } else {
+            passwordInputLayout.setError(null);
+            passwordInputLayout.setErrorEnabled(false);
+            return true;
+        }
     }
 
-    private void displayErrorMessage(String input, TextInputLayout inputLayout, String errorMessage, TextInputEditText inputEditText){
-        if (input.isEmpty()){
-            inputLayout.setError(errorMessage);
-            inputEditText.requestFocus();
+    private boolean isFullNameValid() {
+        full_name = Objects.requireNonNull(fullNameEditText.getText()).toString();
+        if (full_name.isEmpty()) {
+            fullNameInputLayout.setError(EMPTY_ERROR_MESSAGE);
+            return false;
+        } else {
+            fullNameInputLayout.setError(null);
+            fullNameInputLayout.setErrorEnabled(false);
+            return true;
+        }
+    }
+
+    private boolean isEmailValidate() {
+        email = Objects.requireNonNull(emailEditText.getText()).toString();
+        if (email.isEmpty()) {
+            emailInputLayout.setError(EMPTY_ERROR_MESSAGE);
+            return false;
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            emailInputLayout.setError("Please enter a valid email");
+            return false;
+        } else {
+            emailInputLayout.setError(null);
+            emailInputLayout.setErrorEnabled(false);
+            return true;
         }
     }
 
